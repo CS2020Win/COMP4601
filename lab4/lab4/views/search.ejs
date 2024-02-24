@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results for <%= searchTerm %></h1>
+    <ul>
+        <% results.forEach(result => { %>
+            <li><%= result %>  </li>
+        <% }); %>
+    </ul>
+    <form action="/search" method="get">
+        <input type="text" name="q" placeholder="Search..." value="<%= searchTerm %>">
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>
