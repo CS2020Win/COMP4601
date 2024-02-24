@@ -1,0 +1,42 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ShoppingCartItem from "../../components/ShoppingCartItem.astro";
+import { type OrderView } from "../../Utils";
+
+const order_data = await fetch("http://localhost:4321/api/orders").then(
+  (resp) => resp.json()
+);
+const order_quantity = order_data.quantity;
+const totalAmount = order_data.totalAmount;
+const orders = order_data.data;
+---
+
+<Layout title="E-Shop Order List">
+  <main>
+    <div class="mx-auto max-w-7xl py-6 px-4">
+      <h1 class="font-bold text-5xl">Shopping Cart</h1>
+      
+      <div class="flex flex-col gap-4 py-4">
+        {
+          orders.map((order: OrderView) => {
+
+            const amount=order.price*order.quantity;
+
+            return (
+              <ShoppingCartItem
+                id={order.id}
+                productId={order.productId}
+                title={order.productName}
+                stock={order.stock}
+                price={order.price}
+                quantity={order.quantity}
+                amount={amount}
+              />
+            );
+          })
+        }
+        <div class="flex flex-col items-end gap-4"><p class="font-bold"><span class="pr-1">Subtotal: ({order_quantity} items) $</span>{totalAmount}</p></div>
+      </div>
+    </div>
+  </main>
+</Layout>

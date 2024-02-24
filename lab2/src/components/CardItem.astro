@@ -1,0 +1,64 @@
+---
+import CartIcon from "./icons/CartIcon.astro";
+const { id, title, averageRating, stock, price } = Astro.props;
+---
+
+<div class="card card-compact w-96 bg-base-100 shadow-xl">
+  <figure>
+    <img src="/140.webp" alt={title} width={384} height={140} />
+  </figure>
+  <div class="card-body">
+    <input type="hidden" value={id} name="card_product_id" />
+    <div class="text-sm text-slate-600"></div>
+    <h2 class="card-title">{title}</h2>
+    <p class="font-bold text-slate-600">
+      Rating: {Number(averageRating).toFixed(1)}
+    </p>
+    <p class="font-bold text-slate-600">
+      Stock: {stock}
+    </p>
+    <div class="card-actions justify-end">
+      <button class="btn btn-primary" name="cart_btn" value={id}>
+        <span>${price?.toFixed(2)}</span>
+        <CartIcon class="h-5 w-5" />
+      </button>
+      <script>
+        const buttons = document.querySelectorAll('button[name="cart_btn"]');
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const productId = button.value; //获取产品ID
+            const res = fetch("http://localhost:4321/api/orders", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: productId,
+                purchaser: "test_user1",
+              }),
+            }).then((response)=>response.json())
+              .then((resp) => {
+                alert("添加到购物车 " + resp["message"]);
+                console.log(resp);
+                const cart_resp = fetch("http://localhost:4321/api/orders");
+                cart_resp
+                  .then((resp) => resp.json())
+                  .then((respData) => {
+                    const cartCount = respData["quantity"];
+                    console.log(cartCount);
+                    document.querySelector("#product-count").innerHTML = cartCount;
+                  })
+                  .catch((err) => console.log(err));
+              })
+              .catch((err) => {
+                console.log("添加到购物车失败");
+                alert("添加到购物车失败!" + err);
+              });
+          });
+        });
+      </script>
+
+      <a href={`/products/${id}`} class="btn btn-primary"> View Details</a>
+    </div>
+  </div>
+</div>
