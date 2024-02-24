@@ -1,0 +1,267 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CardItem from "../../components/CardItem.astro";
+
+import { httpFetch, type Product } from "../../Utils";
+
+const searchTerm = Astro.url.searchParams.get("name")! || "";
+const instock = Astro.url.searchParams.get("instock")! || "";
+
+let search_str = "?";
+if (searchTerm !== "") {
+  search_str += "name=" + searchTerm + "&";
+}
+if (instock !== "") {
+  search_str += "instock=" + instock;
+}
+
+// console.log("http://localhost:4321/api/products" + search_str);
+
+const productList = await httpFetch(
+  "http://localhost:4321/api/products" + search_str
+);
+---
+
+<Layout title="E-Shop Product List">
+  <div class="flex flex-row justify-center gap-4">
+    <aside class="sidebar mt-8">
+      <div class="card w-64 bg-base-100 shadow-xl">
+        <!-- <figure><img src="/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" /></figure> -->
+        <div class="card-body">
+          <h2 class="card-title">Filter</h2>
+          <div class="form-control">
+            <label class="label cursor-pointer">
+              <span class="label-text">All</span>
+              <input
+                type="radio"
+                name="search_radio_3"
+                class="radio checked:bg-red-500"
+                value="-1"
+                checked
+              />
+            </label>
+            <label class="label cursor-pointer">
+              <span class="label-text">In Stock</span>
+              <input
+                type="radio"
+                name="search_radio_3"
+                class="radio checked:bg-blue-500"
+                value="1"
+              />
+            </label>
+            <label class="label cursor-pointer">
+              <span class="label-text">Out of Stock</span>
+              <input
+                type="radio"
+                name="search_radio_3"
+                class="radio checked:bg-blue-500"
+                value="0"
+              />
+            </label>
+            <label class="label">
+              <span class="label-text">Keyword</span>
+            </label>
+            <input
+              id="search_input_text"
+              type="text"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+          </div>
+
+          <div class="card-actions justify-end">
+            <button class="btn btn-primary" id="search_btn" name="search_btn"
+              >Search</button
+            >
+          </div>
+        </div>
+      </div>
+      <script>
+        const radioGroup = document.querySelectorAll<HTMLInputElement>(
+          'input[type="radio"][name="search_radio_3"]'
+        );
+
+        let checkedValue = "";
+
+        radioGroup.forEach((radio) => {
+          radio.addEventListener("change", () => {
+            checkedValue = radio.value;
+          });
+        });
+        const button = document.getElementById("search_btn");
+        const inputText = document.getElementById("search_input_text");
+        const checkedRadio = document.querySelector<HTMLInputElement>(
+          'input[type="radio"][name="search_radio_3"]:checked'
+        );
+
+        // Handle clicks on each button.
+        button.addEventListener("click", () => {
+          const searchTerm = inputText.value;
+          let searchStr = "?";
+          if (searchTerm !== "" && searchTerm != undefined) {
+            searchStr += "name=" + searchTerm+"&";
+          } 
+          if(checkedValue===-1){
+
+          }else {
+            searchStr+="instock="+checkedValue;
+          }
+
+        //   console.log("http://localhost:4321/products"+searchStr);
+          //   window.location.href = 'https://www.example.com';
+          document.location.href = "http://localhost:4321/products"+searchStr;
+
+          //   // 获取选中值
+          //   const value = checkedRadio!.value;
+
+        });
+      </script>
+    </aside>
+    <main class="max-w-7xl py-6 px-4">
+      <div
+        class="grid grid-cols-1 gap-x-2 gap-y-10 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 xl:gap-x-8"
+      >
+        {
+          productList.map((product: Product) => {
+            // console.log(product.name)
+            return (
+              <CardItem
+                id={product.id}
+                title={product.name.toString()}
+                price={product.price}
+                averageRating={product.rating}
+                stock={product.stock}
+              />
+            );
+          })
+        }
+        <div class="mx-auto">
+          <button
+            class="btn btn-primary"
+            id="show_add_item_modal_btn"
+            onclick="my_modal_1.showModal()">Add Item</button>
+        </div>
+      </div>
+      <!-- Open the modal using ID.showModal() method -->
+      <dialog id="my_modal_1" class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">Add Item</h3>
+
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Name:</span>
+            </label>
+            <input
+              type="text"
+              id="new_item_name"
+              name="new_item_name"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+          </div>
+
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Price:</span>
+            </label>
+            <input
+              type="text"
+              id="new_item_price"
+              name="new_item_price"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+          </div>
+
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Stock:</span>
+            </label>
+            <input
+              type="text"
+              id="new_item_in_stock"
+              name="new_item_in_stock"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+          </div>
+
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text font-bold">Dimensions:</span>
+            </label>
+            <span>X:</span>
+            <input
+              type="text"
+              id="new_item_d_x"
+              name="new_item_d_x"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+            <span>Y:</span>
+            <input
+              type="text"
+              id="new_item_d_y"
+              name="new_item_d_y"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+            <span>Z:</span>
+            <input
+              type="text"
+              id="new_item_d_z"
+              name="new_item_d_z"
+              placeholder="Type here"
+              class="input input-bordered w-full max-w-xs"
+            />
+          </div>
+          <div class="modal-action">
+            <form method="dialog">
+              <div class="flex gap-4">
+                <button class="btn">Close</button>
+                <button class="btn" id="add_item_btn">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </dialog>
+      <script>
+        const button = document.getElementById("add_item_btn");
+        const x = document.getElementById("new_item_d_x");
+        const y = document.getElementById("new_item_d_y");
+        const z = document.getElementById("new_item_d_z");
+        const name = document.getElementById("new_item_name");
+        const stock = document.getElementById("new_item_in_stock");
+        const price = document.getElementById("new_item_price");
+        // 获取输入的值
+
+        // Handle clicks on each button.
+        button.addEventListener("click", () => {
+          const x_val = x.value;
+          const y_val = y.value;
+          const z_val = z.value;
+          const name_val = name.value;
+          const stock_val = stock.value;
+          const price_val = price.value;
+
+          const res = fetch("http://localhost:4321/api/products", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name_val,
+              price: price_val,
+              stock: stock_val,
+              x_val: x_val,
+              y_val: y_val,
+              z_val: z_val,
+            }),
+          });
+          location.reload();
+
+        });
+      </script>
+    </main>
+  </div>
+</Layout>

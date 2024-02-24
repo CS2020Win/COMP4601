@@ -1,0 +1,386 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+const { id } = Astro.params;
+
+const item = await fetch("http://localhost:4321/api/products/" + id, {
+  method: "GET",
+  headers: { "Content-Type": "application/json" },
+}).then((res) => res.json());
+
+
+const ratingList = await fetch("http://localhost:4321/api/ratings?productId=" + id, {
+  method: "GET",
+  headers: { "Content-Type": "application/json" },
+}).then((res) => res.json());
+
+---
+
+<Layout title={item.name}>
+  <main>
+    <div class="mx-auto max-w-7xl pb-4 px-4">
+      <div class="hero h-auto justify-start shadow-xl rounded-box">
+        <div class="hero-content flex-col lg:flex-row">
+          <img src="/280.webp" alt="" width={200} height={280} />
+          <div class="flex flex-col gap-2">
+            <input type="hidden" id="product_id" value={id}/>
+            <h1 class="text-5xl font-bold">{item.name}</h1>
+            <p class="pt-6">
+              <span class="text-lg font-bold pr-4">Rating:</span>{
+                Number(item.rating).toFixed(1)
+              }
+            </p>
+            <p>
+              <span class="text-lg font-bold pr-4">Dimensions:</span>(x={
+                item.dimensions.x
+              },y={item.dimensions.y},z={item.dimensions.z})
+            </p>
+            <p>
+              <span class="text-lg font-bold pr-4">Price:</span>$ {item.price}
+            </p>
+            <p>
+              <span class="text-lg font-bold pr-4">In stock:</span>{item.stock}
+            </p>
+            <div class="flex gap-3">
+              <button
+                class="btn btn-primary w-24"
+                onclick="my_modal_5.showModal()">Edit</button
+              >
+              <!-- <button class="btn btn-primary w-24">Delete</button> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero h-auto justify-start mt-6">
+        <div class="max-w-md">
+          <h2 class="text-3xl font-bold">Ratings</h2>
+          <p class="py-1">
+            <div class="flex items-center py-2">
+              <div class="rating rating-sm rating-half">
+                <input type="radio" name="rating-10" class="rating-hidden" checked />
+                {
+                  [1,2,3,4,5,6,7,8,9,10].map(cnt => {
+                    const r =  Math.floor(Number(item.rating) + 0.5);
+                    
+                    if (cnt%2==1) {
+                      if(cnt===r){
+                        return(
+                          <input
+                            type="radio"
+                            name="rating-10"
+                            class="bg-green-500 mask mask-star-2 mask-half-1"
+                            disabled
+                            readonly
+                            checked
+                          />
+                        )
+                      }else{
+                        return(
+                          <input
+                            type="radio"
+                            name="rating-10"
+                            class="bg-green-500 mask mask-star-2 mask-half-1"
+                            disabled
+                            readonly
+                          />
+                        )
+                      }
+                    }else{
+                      if(cnt===r){
+                        return(
+                          <input
+                            type="radio"
+                            name="rating-10"
+                            class="bg-green-500 mask mask-star-2 mask-half-2"
+                            disabled
+                            readonly
+                            checked
+                          />
+                        )
+                      }else{
+                        return(
+                          <input
+                            type="radio"
+                            name="rating-10"
+                            class="bg-green-500 mask mask-star-2 mask-half-2"
+                            disabled
+                            readonly
+                          />
+                        )
+                      }
+                    }
+                  })
+                }
+                
+              </div>
+              <div class="ml-2">{Number(item.rating).toFixed(1)}</div>
+            </div>
+          </p>
+        </div>
+        <button class="btn btn-info" onclick="my_modal_rating.showModal()">Add Review</button>
+        <dialog id="my_modal_rating" class="modal">
+          <div class="modal-box">
+            <h3 class="font-bold text-lg">Rating!</h3>
+            <div class="rating rating-lg rating-half mt-4">
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="rating-hidden"
+                checked
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-1"
+                value="1"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-2"
+                value="2"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-1"
+                value="3"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-2"
+                value="4"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-1"
+                value="5"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-2"
+                value="6"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-1"
+                value="7"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-2"
+                value="8"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-1"
+                value="9"
+              />
+              <input
+                type="radio"
+                name="rating-10-rating"
+                class="bg-green-500 mask mask-star-2 mask-half-2"
+                value="10"
+              />
+            </div>
+            <div class="modal-action">
+              <form method="dialog">
+                <div class="flex gap-4">
+                  <button class="btn">Close</button>
+                  <button class="btn" id="rating_item_save_btn">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </dialog>
+        <div class="overflow-x-auto mt-16">
+          <table class="table">
+            <thead>
+              <tr><th>Name</th><th>Rating</th><th>Date</th><th></th></tr>
+            </thead>
+            <tbody>
+              {
+                ratingList.map(rating => {
+                  // console.log(product.name)
+                  return (
+                      <tr>
+                        <td><span>{rating.name}</span></td>
+                        <td>{rating.score}</td>
+                        <td>{rating.date}</td>
+                      </tr>
+                  );
+                })
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+  <dialog id="my_modal_5" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Edit Item Info</h3>
+
+      <div class="form-control w-full max-w-xs">
+        <label class="label">
+          <span class="label-text">Name:</span>
+        </label>
+        <input
+          type="text"
+          id="edit_item_name"
+          name="edit_item_name"
+          value={item.name}
+          placeholder="Type here"
+          class="input input-bordered w-full max-w-xs"
+        />
+      </div>
+
+      <div class="form-control w-full max-w-xs">
+        <label class="label">
+          <span class="label-text">Price:</span>
+        </label>
+        <input
+          type="text"
+          id="edit_item_price"
+          name="edit_item_price"
+          value={item.price}
+          placeholder="Type here"
+          class="input input-bordered w-full max-w-xs"
+        />
+      </div>
+
+      <div class="form-control w-full max-w-xs">
+        <label class="label">
+          <span class="label-text">Stock:</span>
+        </label>
+        <input
+          type="text"
+          id="edit_item_in_stock"
+          name="edit_item_in_stock"
+          value={item.stock}
+          placeholder="Type here"
+          class="input input-bordered w-full max-w-xs"
+        />
+      </div>
+
+      <div class="form-control w-full max-w-xs">
+        <label class="label">
+          <span class="label-text font-bold">Dimensions:</span>
+        </label>
+        <span>X:</span>
+        <input
+          type="text"
+          id="edit_item_d_x"
+          name="edit_item_d_x"
+          value={item.dimensions.x}
+          placeholder="Type here"
+          class="input input-bordered w-full max-w-xs"
+        />
+        <span>Y:</span>
+        <input
+          type="text"
+          id="edit_item_d_y"
+          name="edit_item_d_y"
+          value={item.dimensions.y}
+          placeholder="Type here"
+          class="input input-bordered w-full max-w-xs"
+        />
+        <span>Z:</span>
+        <input
+          type="text"
+          id="edit_item_d_z"
+          name="edit_item_d_z"
+          value={item.dimensions.z}
+          placeholder="Type here"
+          class="input input-bordered w-full max-w-xs"
+        />
+      </div>
+      <div class="modal-action">
+        <form method="dialog">
+          <div class="flex gap-4">
+            <button class="btn">Close</button>
+            <button class="btn" id="item_update_btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+  <script>
+    const button = document.getElementById("item_update_btn");
+    const x = document.getElementById("edit_item_d_x");
+    const y = document.getElementById("edit_item_d_y");
+    const z = document.getElementById("edit_item_d_z");
+    const name = document.getElementById("edit_item_name");
+    const stock = document.getElementById("edit_item_in_stock");
+    const price = document.getElementById("edit_item_price");
+    const hideProductId=document.getElementById("product_id");
+    // Handle clicks on each button.
+    button.addEventListener("click", () => {
+      // console.log("Click");
+      const x_val = x.value;
+          const y_val = y.value;
+          const z_val = z.value;
+          const name_val = name.value;
+          const stock_val = stock.value;
+          const price_val = price.value;
+          const id = hideProductId.value;
+          const res = fetch("http://localhost:4321/api/products", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: id,
+              name: name_val,
+              price: price_val,
+              stock: stock_val,
+              x_val: x_val,
+              y_val: y_val,
+              z_val: z_val,
+            }),
+          });
+          location.reload();
+    });
+  </script>
+
+  
+  <script>
+    const button = document.getElementById("rating_item_save_btn");
+    const idInput = document.getElementById("product_id");
+
+    const radioGroup = document.querySelectorAll<HTMLInputElement>(
+      'input[type="radio"][name="rating-10-rating"]'
+    );
+    
+    let checkedValue = "";
+
+    radioGroup.forEach((radio) => {
+      radio.addEventListener("change", () => {
+        checkedValue = radio.value;
+      });
+    });
+
+    // Handle clicks on each button.
+    button.addEventListener("click", () => {
+      const productId=idInput.value;
+      const res = fetch("http://localhost:4321/api/ratings", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              productId: productId,
+              score: checkedValue
+            }),
+          });
+          location.reload();
+    });
+  </script>
+</Layout>

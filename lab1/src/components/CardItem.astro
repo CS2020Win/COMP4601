@@ -1,0 +1,29 @@
+---
+import CartIcon from "./icons/CartIcon.astro";
+const { id, title, averageRating, stock, price } = Astro.props;
+---
+
+<div class="card card-compact w-96 bg-base-100 shadow-xl">
+  <figure>
+    <img src="/140.webp" alt={title} width={384} height={140} />
+  </figure>
+  <div class="card-body">
+    <div class="text-sm text-slate-600"></div>
+    <h2 class="card-title">{title}</h2>
+    <p class="font-bold text-slate-600">
+      Rating: {Number(averageRating).toFixed(1)}
+    </p>
+    <p class="font-bold text-slate-600">
+      Stock: {stock}
+    </p>
+    <div class="card-actions justify-end">
+      <button class="btn btn-primary">
+        <span>${price?.toFixed(2)}</span>
+        <CartIcon class="h-5 w-5" />
+      </button>
+      <a href={`/products/${id}`} class="btn btn-primary">
+        View Details
+      </a>
+    </div>
+  </div>
+</div>
